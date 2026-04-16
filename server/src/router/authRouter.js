@@ -1,17 +1,12 @@
 const express = require("express");
 const authRouter = express.Router();
+const asyncHandler = require("../utills/asyncHandler");
 
-authRouter.post("/register", async (req, res, next) => {
-	try {
-		const { firstName, lastName, email, password } = req.body;
-
-		if(!firstName || !lastName || !email || !password){
-			return next(new Error("all fields required"))
-		}
-		console.log(user);
-	} catch (error) {
-		console.log(error);
-	}
-});
+authRouter.post(
+	"/register",
+	asyncHandler(async (req, res) => {
+		 throw new Error("Test error");
+	}),
+);
 
 module.exports = { authRouter };
