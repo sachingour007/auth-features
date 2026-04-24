@@ -53,4 +53,40 @@ authRouter.post(
 	}),
 );
 
+authRouter.post(
+	"/login",
+	asyncHandler(async (req, res, next) => {
+		const { email, password } = req.body;
+
+		if (!email || !password) {
+			return next(new ApiError(400, "All fields required!"));
+		}
+
+		const userDetails = await User.findOne({ email });
+
+		if (!userDetails) {
+			return next(new ApiError(400, "Wrong Creadientials"));
+		}
+
+		const passwordChecking = await userDetails.comparePass(password);
+		if (!passwordChecking) {
+			return next(new ApiError(404, "Wrong Creadientials"));
+		}
+
+		const token = await userDetails.getJWT();
+
+		res.cookie("token", token, {
+			httpOnly: true,
+			// secure: true,
+			sameSite: "strict",
+			maxAge: 60 * 60 * 1000,
+		});
+
+		userDetails.password = undefined;
+		return res
+			.status(200)
+			.json(new ApiResponse(200, userDetails, "Login SuccessFuly!"));
+	}),
+);
+
 module.exports = { authRouter };

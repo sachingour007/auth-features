@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const jwtLib = require("jsonwebtoken");
 const config = require("../config/config");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 const { default: isEmail } = require("validator/lib/isEmail");
 
 const userSchema = new mongoose.Schema(
@@ -37,6 +38,12 @@ const userSchema = new mongoose.Schema(
 	},
 	{ timestamps: true },
 );
+
+userSchema.methods.comparePass = async function (password) {
+	const user = this;
+	const verifyPassword = await bcrypt.compare(password, user.password);
+	return verifyPassword;
+};
 
 userSchema.methods.getJWT = async function () {
 	const user = this;
